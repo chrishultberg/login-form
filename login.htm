@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Floating label adjustments */
+    .floating-label {
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: #9ca3af;
+      transition: all 0.2s ease-in-out;
+      pointer-events: none;
+      background-color: white;
+      padding: 0 4px;
+    }
+
+    input:focus~.floating-label,
+    input:not(:placeholder-shown)~.floating-label {
+      top: -1px;
+      font-size: 0.75rem;
+      color: #2563eb;
+    }
+
+    input {
+      width: 100%;
+      padding-top: 1.25rem;
+      padding-bottom: 0.5rem;
+      border: 1px solid #d1d5db;
+      /* Tailwind's gray-300 */
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #93c5fd;
+      /* Subtle blue focus ring */
+      border-color: #2563eb;
+      /* Tailwind's blue-500 */
+    }
+
+    /* Prevent autofill background interference for both username and password inputs */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active,
+    input:-internal-autofill-selected {
+      background-color: white !important;
+      background-image: none !important;
+      color: #000000 !important;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: #000000;
+      transition: background-color 5000s ease-in-out 0s;
+      box-shadow: inset 0 0 20px 20px #ffffff;
+    }
+
+    body {
+      background-color: #f3f4f6;
+      /* Tailwind's gray-100 */
+    }
+
+    /* Disabled state */
+    button:disabled {
+      background-color: #3b82f665;
+      /* Tailwind's blue-500 at 65% */
+      cursor: not-allowed;
+    }
+
+    button {
+      transition: background-color 0.2s, box-shadow 0.2s;
+    }
+
+    button:not([disabled]):hover {
+      color: white;
+      background-color: #2563eb !important;
+      /* Tailwind's blue-600 */
+    }
+
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 4px #bfdbfe;
+      /* Tailwind's blue-300 */
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="w-full max-w-lg bg-white rounded-lg shadow-lg p-6">
+    <!-- Multi-step Form Container -->
+    <div id="login-container">
+      <!-- Step 1: Username -->
+      <div id="step-username" class="flex flex-col items-center">
+        <div class="mb-4">
+          <div class="w-20 h-20 bg-gray-200 rounded-full border-2 border-blue-500 flex items-center justify-center text-gray-400 text-xs">
+            80 x 80
+          </div>
+        </div>
+        <h2 id="welcome-text" class="text-xl font-semibold text-gray-800">Sign In</h2>
+        <form id="username-form" class="mt-6 w-full">
+          <div class="relative mt-4">
+            <input id="username" type="email" placeholder=" " class="peer block w-full px-4 py-2 border rounded-lg shadow-sm" required oninput="validateEmail()" />
+            <label for="username" class="floating-label">Enter your email</label>
+          </div>
+          <button type="button" id="next-button" class="w-full mt-6 bg-blue-500 text-white py-2 px-4 rounded-lg focus:ring-4 focus:ring-blue-300" onclick="goToPasswordStep()" disabled>
+            Next
+          </button>
+        </form>
+      </div>
+      <!-- Step 2: Password -->
+      <div id="step-password" class="hidden flex flex-col items-center">
+        <div class="mb-4">
+          <div class="w-20 h-20 bg-gray-200 rounded-full border-2 border-blue-500 flex items-center justify-center text-gray-400 text-xs">
+            80 x 80
+          </div>
+        </div>
+        <h2 id="password-welcome-text" class="text-xl font-semibold text-gray-800">Welcome</h2>
+        <p id="username-display" class="text-gray-500 text-sm"></p>
+        <form id="password-form" class="mt-6 w-full">
+          <div class="relative mt-4">
+            <input id="password" type="password" placeholder=" " class="peer block w-full px-4 py-2 border rounded-lg shadow-sm" required />
+            <label for="password" class="floating-label">Enter your password</label>
+          </div>
+          <div class="mt-4 text-right">
+            <a href="#" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
+          </div>
+          <div class="flex mt-6 space-x-4">
+            <button type="button" class="flex-1 bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 focus:ring-4 focus:ring-gray-200" onclick="goToUsernameStep()">
+              Back
+            </button>
+            <button type="submit" class="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 focus:ring-4 focus:ring-blue-300">
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div class="px-6 mt-6 text-center text-sm text-gray-500">
+      <a href="#" class="hover:underline">Privacy</a>
+      <span class="mx-2">•</span>
+      <a href="#" class="hover:underline">Terms</a>
+      <span class="mx-2">•</span>
+      <a href="#" class="hover:underline">Help</a>
+    </div>
+  </div>
+  <script>
+    function validateEmail() {
+      const username = document.getElementById('username').value;
+      const nextButton = document.getElementById('next-button');
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      // Enable the button only if the email is valid
+      nextButton.disabled = !emailRegex.test(username);
+    }
+
+    function goToPasswordStep() {
+      // Get the username input value
+      const username = document.getElementById('username').value;
+      // Hide the username step and show the password step
+      document.getElementById('step-username').classList.add('hidden');
+      document.getElementById('step-password').classList.remove('hidden');
+      // Display the username and update the welcome text
+      document.getElementById('username-display').textContent = username;
+    }
+
+    function goToUsernameStep() {
+      // Hide the password step and show the username step
+      document.getElementById('step-password').classList.add('hidden');
+      document.getElementById('step-username').classList.remove('hidden');
+    }
+  </script>
+</body>
+
+</html>
